@@ -1,0 +1,17 @@
+{
+  "fixtureId": "malformed-truncated",
+  "kind": "malformed-response",
+  "promptVersion": "lld-eval-v1",
+  "model": "gemini-2.5-flash",
+  "recordedBy": "hand-authored",
+  "notes": "Malformed shape 2 of 3: TRUNCATED. Output hit maxOutputTokens mid-string, so no balanced object exists. salvageJson must FAIL here rather than closing the braces itself: a guessed tail produces syntactically valid JSON with silently invented scores, which is the single worst outcome for a platform whose promise is that every score is evidenced. Correct behaviour is salvage fails, one structure-only repair call is made, and if that also fails the attempt is FAILED with failureReason LLM_MALFORMED_OUTPUT while the deterministic findings still persist and display.",
+  "envelope": "truncated",
+  "basedOn": "parking-lot-weak",
+  "expected": {
+    "salvages": false,
+    "validates": false,
+    "repairCalls": 1
+  },
+  "rawText": "{\n  \"results\": [\n    {\n      \"criterionKey\": \"requirements_and_assumptions\",\n      \"score\": 1,\n      \"evidence\": \"The parking lot has cars. | Users can park and unpark.\",\n      \"concern\": \"Both assumptions restate the problem rather than resolving anything ambiguous. Nothing is decided about floors, slot sizes, vehicle types, pricing basis or whether payment is in scope, so the class list that follows has no stated boundary to respect.\",\n      \"suggestion\": \"In the assumptions section, write three decisions that would change your classes if answered differently: the number of floors, whether slot size varies by vehicle type, and whether payment is in scope.\",\n      \"confidence\": \"high\"\n    },\n    {\n      \"criterionKey\": \"responsibilities_and_decomposition\",\n      \"score\": 1,\n      \"evidence\": \"ParkingLot - manages everything about the parking lot | Methods: addCar(), removeCar(), calculatePrice(), printTicket(), findSlot(), openGate(), closeGate(), saveToDatabase(), sendEmail() | Ticket - a ticket\",\n      \"concern\": \"The word 'everything' is accurate: ParkingLot mixes slot allocation (findSlot), pricing (calculatePrice), hardware control (openGate), persistence (saveToDatabase) and notification (sendEmail) in one class, which is five reasons to change. Ticket has no responsibility beyond its own name and no methods, so it is a label rather than a class.\",\n      \"suggestion\": \"Pull the five concerns out of ParkingLot into separate classes, starting with pricing and persistence which have nothing to do with each other, and give Ticket a real job such as recording entry time and the slot it holds.\",\n      \"confidence\": \"high\"\n    },\n    {\n      \"criterionKey\": \"coupling_and_cohesion\",\n      \"score\": 1,\n      \"evidence\": \"all classes interact with ParkingLot | ParkingLot has Cars\",\n      \"concern\": \"'all classes interact with ParkingLot' states no direction and no reason, and describes a hub that every other class depends on. With saveToDatabase and sendEmail also on ParkingLot, a change to storage or notification reaches every class in the design.\",\n      \"suggestion\": \"Rewrite each relationship in the Relationships section as 'A holds or uses B becau",
+  "parsed": null
+}

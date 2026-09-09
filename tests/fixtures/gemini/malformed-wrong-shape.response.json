@@ -1,0 +1,45 @@
+{
+  "fixtureId": "malformed-wrong-shape",
+  "kind": "malformed-response",
+  "promptVersion": "lld-eval-v1",
+  "model": "gemini-2.5-flash",
+  "recordedBy": "hand-authored",
+  "notes": "Malformed shape 3 of 3: WRONG SHAPE. It parses perfectly, which is exactly why it is dangerous - only Ajv stops it. Three violations at once: an overallScore field (the 100-point anti-pattern the whole platform is built against, rejected by additionalProperties false), only three of five results (minItems), and a criterionKey outside the rubric enum. This is the fixture behind test T4. Note the second result: an integer score whose evidence is a plausible sentence the learner never wrote - if it were reached, verifyEvidence would force it to null rather than let it through.",
+  "envelope": "plain",
+  "expected": {
+    "salvages": true,
+    "validates": false,
+    "repairCalls": 1
+  },
+  "rawText": "{\n  \"overallScore\": 72,\n  \"grade\": \"C+\",\n  \"results\": [\n    {\n      \"criterionKey\": \"requirements_and_assumptions\",\n      \"score\": 2,\n      \"evidence\": \"The parking lot has cars.\",\n      \"concern\": \"The assumptions restate the problem.\",\n      \"suggestion\": \"Write assumptions that close a real ambiguity.\",\n      \"confidence\": \"high\"\n    },\n    {\n      \"criterionKey\": \"responsibilities_and_decomposition\",\n      \"score\": 3,\n      \"evidence\": \"The design carefully separates allocation from pricing using a dedicated SlotAllocator collaborator.\",\n      \"concern\": \"Minor naming inconsistencies remain across the class list.\",\n      \"suggestion\": \"Rename SlotAllocator to AllocationPolicy for consistency.\",\n      \"confidence\": \"high\"\n    },\n    {\n      \"criterionKey\": \"overall_design_quality\",\n      \"score\": 3,\n      \"evidence\": \"Overall this is a reasonable first attempt at the problem.\",\n      \"concern\": \"Some sections are thinner than others.\",\n      \"suggestion\": \"Expand the thinner sections on the next attempt.\",\n      \"confidence\": \"medium\"\n    }\n  ]\n}",
+  "parsed": {
+    "overallScore": 72,
+    "grade": "C+",
+    "results": [
+      {
+        "criterionKey": "requirements_and_assumptions",
+        "score": 2,
+        "evidence": "The parking lot has cars.",
+        "concern": "The assumptions restate the problem.",
+        "suggestion": "Write assumptions that close a real ambiguity.",
+        "confidence": "high"
+      },
+      {
+        "criterionKey": "responsibilities_and_decomposition",
+        "score": 3,
+        "evidence": "The design carefully separates allocation from pricing using a dedicated SlotAllocator collaborator.",
+        "concern": "Minor naming inconsistencies remain across the class list.",
+        "suggestion": "Rename SlotAllocator to AllocationPolicy for consistency.",
+        "confidence": "high"
+      },
+      {
+        "criterionKey": "overall_design_quality",
+        "score": 3,
+        "evidence": "Overall this is a reasonable first attempt at the problem.",
+        "concern": "Some sections are thinner than others.",
+        "suggestion": "Expand the thinner sections on the next attempt.",
+        "confidence": "medium"
+      }
+    ]
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "fixtureId": "parking-lot-weak",
+  "kind": "response",
+  "promptVersion": "lld-eval-v1",
+  "model": "gemini-2.5-flash",
+  "temperature": 0.1,
+  "recordedBy": "hand-authored",
+  "recordedAt": null,
+  "submissionFixture": "parking-lot-weak.submission.json",
+  "notes": "HAND-AUTHORED, NOT RECORDED FROM THE LIVE API. It is the assertion target from RUBRIC_AND_EVALUATION.md section 8.3, adjusted so every quote is a real substring of TextDesignContent.toEvaluationText() for the paired submission. Re-record with `node scripts/record-fixtures.ts --record` once the prompt is frozen and an API key is available; `recordedBy` will then read \"live\". Supports T1 (anti-sycophancy: no score above 2), T2 (evidence grounding), T3 (absent evidence returns null, not an invention), T4/T5 (no global score, schema conformance).",
+  "criterionKeys": [
+    "requirements_and_assumptions",
+    "responsibilities_and_decomposition",
+    "coupling_and_cohesion",
+    "abstraction_and_interfaces",
+    "extensibility"
+  ],
+  "rawText": "{\n  \"results\": [\n    {\n      \"criterionKey\": \"requirements_and_assumptions\",\n      \"score\": 1,\n      \"evidence\": \"The parking lot has cars. | Users can park and unpark.\",\n      \"concern\": \"Both assumptions restate the problem rather than resolving anything ambiguous. Nothing is decided about floors, slot sizes, vehicle types, pricing basis or whether payment is in scope, so the class list that follows has no stated boundary to respect.\",\n      \"suggestion\": \"In the assumptions section, write three decisions that would change your classes if answered differently: the number of floors, whether slot size varies by vehicle type, and whether payment is in scope.\",\n      \"confidence\": \"high\"\n    },\n    {\n      \"criterionKey\": \"responsibilities_and_decomposition\",\n      \"score\": 1,\n      \"evidence\": \"ParkingLot - manages everything about the parking lot | Methods: addCar(), removeCar(), calculatePrice(), printTicket(), findSlot(), openGate(), closeGate(), saveToDatabase(), sendEmail() | Ticket - a ticket\",\n      \"concern\": \"The word 'everything' is accurate: ParkingLot mixes slot allocation (findSlot), pricing (calculatePrice), hardware control (openGate), persistence (saveToDatabase) and notification (sendEmail) in one class, which is five reasons to change. Ticket has no responsibility beyond its own name and no methods, so it is a label rather than a class.\",\n      \"suggestion\": \"Pull the five concerns out of ParkingLot into separate classes, starting with pricing and persistence which have nothing to do with each other, and give Ticket a real job such as recording entry time and the slot it holds.\",\n      \"confidence\": \"high\"\n    },\n    {\n      \"criterionKey\": \"coupling_and_cohesion\",\n      \"score\": 1,\n      \"evidence\": \"all classes interact with ParkingLot | ParkingLot has Cars\",\n      \"concern\": \"'all classes interact with ParkingLot' states no direction and no reason, and describes a hub that every other class depends on. With saveToDatabase and sendEmail also on ParkingLot, a change to storage or notification reaches every class in the design.\",\n      \"suggestion\": \"Rewrite each relationship in the Relationships section as 'A holds or uses B because ...' with one direction only, then check whether any class other than ParkingLot appears on the left-hand side.\",\n      \"confidence\": \"high\"\n    },\n    {\n      \"criterionKey\": \"abstraction_and_interfaces\",\n      \"score\": 1,\n      \"evidence\": \"I used a singleton for ParkingLot because there is only one parking lot. It is a standard pattern used in most designs.\",\n      \"concern\": \"The justification is about the noun, not the pattern: one parking lot in the domain does not require one global instance in the code, and 'a standard pattern used in most designs' is not a reason. Meanwhile no interface exists for pricing, which calculatePrice implies varies, so the one abstraction chosen is the one that was not needed.\",\n      \"suggestion\": \"Drop the singleton and introduce one interface where the requirements actually vary, such as a PricingPolicy with an hourly and a flat-rate implementation, and write one sentence naming what varies behind it.\",\n      \"confidence\": \"high\"\n    },\n    {\n      \"criterionKey\": \"extensibility\",\n      \"score\": null,\n      \"evidence\": \"NO EVIDENCE: looked in the Trade-offs section for a named class that would be added or modified under a new requirement; the section discusses only the singleton choice and names no change to any class.\",\n      \"concern\": \"The submission does not trace any new requirement through the design, so there is nothing to assess on this dimension. This is also the dimension a nine-method ParkingLot is most likely to fail, which makes the gap worth closing first.\",\n      \"suggestion\": \"Add to the Trade-offs section: if electric-vehicle charging slots were required tomorrow, name which classes you would add, which existing classes you would modify, and which stay untouched.\",\n      \"confidence\": \"low\"\n    }\n  ]\n}",
+  "parsed": {
+    "results": [
+      {
+        "criterionKey": "requirements_and_assumptions",
+        "score": 1,
+        "evidence": "The parking lot has cars. | Users can park and unpark.",
+        "concern": "Both assumptions restate the problem rather than resolving anything ambiguous. Nothing is decided about floors, slot sizes, vehicle types, pricing basis or whether payment is in scope, so the class list that follows has no stated boundary to respect.",
+        "suggestion": "In the assumptions section, write three decisions that would change your classes if answered differently: the number of floors, whether slot size varies by vehicle type, and whether payment is in scope.",
+        "confidence": "high"
+      },
+      {
+        "criterionKey": "responsibilities_and_decomposition",
+        "score": 1,
+        "evidence": "ParkingLot - manages everything about the parking lot | Methods: addCar(), removeCar(), calculatePrice(), printTicket(), findSlot(), openGate(), closeGate(), saveToDatabase(), sendEmail() | Ticket - a ticket",
+        "concern": "The word 'everything' is accurate: ParkingLot mixes slot allocation (findSlot), pricing (calculatePrice), hardware control (openGate), persistence (saveToDatabase) and notification (sendEmail) in one class, which is five reasons to change. Ticket has no responsibility beyond its own name and no methods, so it is a label rather than a class.",
+        "suggestion": "Pull the five concerns out of ParkingLot into separate classes, starting with pricing and persistence which have nothing to do with each other, and give Ticket a real job such as recording entry time and the slot it holds.",
+        "confidence": "high"
+      },
+      {
+        "criterionKey": "coupling_and_cohesion",
+        "score": 1,
+        "evidence": "all classes interact with ParkingLot | ParkingLot has Cars",
+        "concern": "'all classes interact with ParkingLot' states no direction and no reason, and describes a hub that every other class depends on. With saveToDatabase and sendEmail also on ParkingLot, a change to storage or notification reaches every class in the design.",
+        "suggestion": "Rewrite each relationship in the Relationships section as 'A holds or uses B because ...' with one direction only, then check whether any class other than ParkingLot appears on the left-hand side.",
+        "confidence": "high"
+      },
+      {
+        "criterionKey": "abstraction_and_interfaces",
+        "score": 1,
+        "evidence": "I used a singleton for ParkingLot because there is only one parking lot. It is a standard pattern used in most designs.",
+        "concern": "The justification is about the noun, not the pattern: one parking lot in the domain does not require one global instance in the code, and 'a standard pattern used in most designs' is not a reason. Meanwhile no interface exists for pricing, which calculatePrice implies varies, so the one abstraction chosen is the one that was not needed.",
+        "suggestion": "Drop the singleton and introduce one interface where the requirements actually vary, such as a PricingPolicy with an hourly and a flat-rate implementation, and write one sentence naming what varies behind it.",
+        "confidence": "high"
+      },
+      {
+        "criterionKey": "extensibility",
+        "score": null,
+        "evidence": "NO EVIDENCE: looked in the Trade-offs section for a named class that would be added or modified under a new requirement; the section discusses only the singleton choice and names no change to any class.",
+        "concern": "The submission does not trace any new requirement through the design, so there is nothing to assess on this dimension. This is also the dimension a nine-method ParkingLot is most likely to fail, which makes the gap worth closing first.",
+        "suggestion": "Add to the Trade-offs section: if electric-vehicle charging slots were required tomorrow, name which classes you would add, which existing classes you would modify, and which stay untouched.",
+        "confidence": "low"
+      }
+    ]
+  }
+}

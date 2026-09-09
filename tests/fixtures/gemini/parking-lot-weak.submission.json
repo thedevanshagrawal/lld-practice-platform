@@ -1,0 +1,56 @@
+{
+  "fixtureId": "parking-lot-weak",
+  "kind": "submission",
+  "notes": "The worked example from RUBRIC_AND_EVALUATION.md section 8.1, expressed as TextDesignSections. Deliberately weak in the four specific ways the rubric is built to catch: a god object, a vacuous responsibility line, a name-dropped Singleton, and no extensibility answer. Feed to TextDesignContent.fromSections(sections); the rendered toEvaluationText() is what every evidence quote in parking-lot-weak.response.json must be a substring of.",
+  "problemSlug": "parking-lot",
+  "sections": {
+    "assumptions": [
+      "The parking lot has cars.",
+      "Users can park and unpark."
+    ],
+    "classes": [
+      {
+        "name": "ParkingLot",
+        "responsibility": "manages everything about the parking lot",
+        "methodNames": [
+          "addCar()",
+          "removeCar()",
+          "calculatePrice()",
+          "printTicket()",
+          "findSlot()",
+          "openGate()",
+          "closeGate()",
+          "saveToDatabase()",
+          "sendEmail()"
+        ]
+      },
+      {
+        "name": "Car",
+        "responsibility": "a car",
+        "methodNames": ["getNumber()"]
+      },
+      {
+        "name": "Ticket",
+        "responsibility": "a ticket",
+        "methodNames": []
+      }
+    ],
+    "relationships": [
+      {
+        "from": "ParkingLot",
+        "to": "Car",
+        "kind": "ASSOCIATION",
+        "note": "ParkingLot has Cars"
+      },
+      {
+        "from": "Car",
+        "to": "ParkingLot",
+        "kind": "UNSPECIFIED",
+        "note": "all classes interact with ParkingLot"
+      }
+    ],
+    "tradeOffs": [
+      "I used a singleton for ParkingLot because there is only one parking lot. It is a standard pattern used in most designs."
+    ]
+  }
+}

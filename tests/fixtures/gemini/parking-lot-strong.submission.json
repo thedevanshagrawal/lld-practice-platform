@@ -1,0 +1,107 @@
+{
+  "fixtureId": "parking-lot-strong",
+  "kind": "submission",
+  "notes": "A deliberately strong counterpart to parking-lot-weak. It exists so the calibration test has an upper anchor as well as a lower one: a rubric that scores everything low is as broken as one that scores everything high. Note the structural properties it is built to have: 16 methods spread across 8 classes with a maximum of 3 on any one, so the D4 god-object check does NOT fire and the section 7.2.5 cap must not be applied to it.",
+  "problemSlug": "parking-lot",
+  "sections": {
+    "assumptions": [
+      "Multiple floors, each with a fixed number of slots configured at construction; the slot count does not change at runtime.",
+      "Slot size is fixed per slot and a vehicle occupies exactly one slot. Assuming fixed slot sizes; if sizes were dynamic, allocation would need to become a separate collaborator rather than living on Floor.",
+      "Payment is out of scope. We model the amount owed and mark a ticket as settled, but no gateway, no refunds and no currency handling.",
+      "Deliberately not modelled: reservations, season passes, and more than one lot. Nothing in the class list below refers to them.",
+      "Clarifying question: is pricing charged per started hour or per completed hour? The answer changes whether PricingPolicy needs the entry timestamp or only a duration."
+    ],
+    "classes": [
+      {
+        "name": "ParkingLot",
+        "responsibility": "owns the set of floors and answers where a vehicle can park",
+        "methodNames": ["findAvailableSlot(size)", "admit(vehicle)", "release(ticket)"]
+      },
+      {
+        "name": "Floor",
+        "responsibility": "holds its own slots and knows which of them are free",
+        "methodNames": ["firstFreeSlot(size)", "occupancy()"]
+      },
+      {
+        "name": "Slot",
+        "responsibility": "represents one physical space and whether it is occupied",
+        "methodNames": ["assignTo(vehicle)", "vacate()", "isFree()"]
+      },
+      {
+        "name": "Vehicle",
+        "responsibility": "identifies one vehicle and the slot size it requires",
+        "methodNames": ["registration()", "requiredSize()"]
+      },
+      {
+        "name": "Ticket",
+        "responsibility": "records entry time and the slot held, and is the unit pricing is calculated against",
+        "methodNames": ["issuedAt()", "slotId()", "close(exitTime)"]
+      },
+      {
+        "name": "PricingPolicy",
+        "responsibility": "interface: turns a closed ticket into an amount owed",
+        "methodNames": ["priceFor(ticket)"]
+      },
+      {
+        "name": "HourlyPricingPolicy",
+        "responsibility": "prices a closed ticket by started hours at a flat hourly rate",
+        "methodNames": ["priceFor(ticket)"]
+      },
+      {
+        "name": "WeekendPricingPolicy",
+        "responsibility": "prices a closed ticket at the weekend rate",
+        "methodNames": ["priceFor(ticket)"]
+      }
+    ],
+    "relationships": [
+      {
+        "from": "ParkingLot",
+        "to": "Floor",
+        "kind": "COMPOSITION",
+        "note": "ParkingLot owns its Floors; a Floor does not know the lot it sits in"
+      },
+      {
+        "from": "Floor",
+        "to": "Slot",
+        "kind": "COMPOSITION",
+        "note": "Floor owns its Slots and is the only thing that hands one out"
+      },
+      {
+        "from": "Slot",
+        "to": "Vehicle",
+        "kind": "ASSOCIATION",
+        "note": "an occupied Slot points at the Vehicle in it; the Vehicle does not point back"
+      },
+      {
+        "from": "Ticket",
+        "to": "Slot",
+        "kind": "ASSOCIATION",
+        "note": "Ticket records the Slot it was issued against by id, not by reference"
+      },
+      {
+        "from": "PricingPolicy",
+        "to": "Ticket",
+        "kind": "DEPENDENCY",
+        "note": "pricing depends on the ticket, not the reverse, so pricing changes never reach the parking flow"
+      },
+      {
+        "from": "HourlyPricingPolicy",
+        "to": "PricingPolicy",
+        "kind": "IMPLEMENTS",
+        "note": null
+      },
+      {
+        "from": "WeekendPricingPolicy",
+        "to": "PricingPolicy",
+        "kind": "IMPLEMENTS",
+        "note": null
+      }
+    ],
+    "tradeOffs": [
+      "PricingPolicy is an interface because the requirements already name hourly and weekend rates. Two implementations exist today, so the abstraction is paid for rather than speculative.",
+      "No PaymentGateway interface: one processor is in scope and a second is not on the roadmap. The seam is Ticket.close(), and I would extract the interface when a second processor arrives, not before.",
+      "If electric-vehicle charging slots were required, I would add a ChargingSlot subtype of Slot and a ChargingRate implementation of PricingPolicy. Floor.firstFreeSlot would have to change because it must match on a capability and not only a size. Ticket, ParkingLot and the two existing pricing policies stay untouched.",
+      "The requirement my design handles badly is per-floor pricing. PricingPolicy is handed a Ticket that carries a slot id and no floor, so pricing would have to look the slot up. I would restructure by putting a small SlotDescriptor value object on the Ticket instead of a bare id."
+    ]
+  }
+}

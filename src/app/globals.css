@@ -1,0 +1,32 @@
+@import 'tailwindcss';
+
+/*
+ * Minimal on purpose. The brief lists "lots of UI with weak practice logic" as a
+ * negative, so this file exists to make the screens legible and nothing else: readable
+ * measure, visible focus rings, plain borders. No design system, no component library.
+ */
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  background: #fafafa;
+  color: #18181b;
+}
+
+a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+input,
+textarea,
+select {
+  background: #ffffff;
+}

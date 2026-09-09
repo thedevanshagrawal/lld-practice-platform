@@ -1,0 +1,63 @@
+{
+  "fixtureId": "parking-lot-strong",
+  "kind": "response",
+  "promptVersion": "lld-eval-v1",
+  "model": "gemini-2.5-flash",
+  "temperature": 0.1,
+  "recordedBy": "hand-authored",
+  "recordedAt": null,
+  "submissionFixture": "parking-lot-strong.submission.json",
+  "notes": "HAND-AUTHORED, NOT RECORDED FROM THE LIVE API. The upper anchor for calibration: a rubric that scores everything low is as broken as one that scores everything high, so the weak fixture alone cannot prove the calibration works. Scores are 3, 3, 3, 4, 4 rather than five 4s on purpose - Proficient is the ceiling for solid work and the two 4s are the two places the submission shows explicit reasoning about a trade-off (declining an abstraction, and naming a requirement the design handles badly). Also asserts the negative case for the section 7.2.5 cap: no class here exceeds the D4 thresholds, so responsibilities_and_decomposition must NOT be capped.",
+  "criterionKeys": [
+    "requirements_and_assumptions",
+    "responsibilities_and_decomposition",
+    "coupling_and_cohesion",
+    "abstraction_and_interfaces",
+    "extensibility"
+  ],
+  "rawText": "{\n  \"results\": [\n    {\n      \"criterionKey\": \"requirements_and_assumptions\",\n      \"score\": 3,\n      \"evidence\": \"Payment is out of scope. We model the amount owed and mark a ticket as settled, but no gateway, no refunds and no currency handling. | Deliberately not modelled: reservations, season passes, and more than one lot.\",\n      \"concern\": \"The clarifying question about started versus completed hours is raised but never answered, and PricingPolicy is specified without it, so priceFor(ticket) is defined against an ambiguity the learner themselves identified as design-changing.\",\n      \"suggestion\": \"In the assumptions section, pick one answer to the started-versus-completed-hour question and state it as an assumption, then check that Ticket carries whatever PricingPolicy needs under that answer.\",\n      \"confidence\": \"high\"\n    },\n    {\n      \"criterionKey\": \"responsibilities_and_decomposition\",\n      \"score\": 3,\n      \"evidence\": \"Floor - holds its own slots and knows which of them are free | Slot - represents one physical space and whether it is occupied | PricingPolicy - interface: turns a closed ticket into an amount owed\",\n      \"concern\": \"Ticket carries two jobs joined by 'and': it records entry time and the slot held, and it is the unit pricing is calculated against. Ticket.close(exitTime) belongs to the first job while slotId() exists only to serve the second, so a change to how pricing reads a ticket reaches the class that records parking events.\",\n      \"suggestion\": \"Split the pricing-facing view off Ticket: give PricingPolicy a small value object such as a ChargeableStay carrying entry time, exit time and slot descriptor, so Ticket stops being a record and a pricing input at once.\",\n      \"confidence\": \"high\"\n    },\n    {\n      \"criterionKey\": \"coupling_and_cohesion\",\n      \"score\": 3,\n      \"evidence\": \"ParkingLot owns its Floors; a Floor does not know the lot it sits in | Ticket records the Slot it was issued against by id, not by reference | pricing depends on the ticket, not the reverse, so pricing changes never reach the parking flow\",\n      \"concern\": \"ParkingLot.findAvailableSlot(size) and Floor.firstFreeSlot(size) are the same query at two levels, so ParkingLot must know that a Floor is the thing that holds slots. That is one level of reach-through, and it is the method that would change first if slots stopped being owned by floors.\",\n      \"suggestion\": \"Decide whether ParkingLot returns a Slot or delegates the whole allocation to Floor and returns only a Ticket. If it returns a Slot, say in the Relationships section why the lot is allowed to know about slots at all.\",\n      \"confidence\": \"medium\"\n    },\n    {\n      \"criterionKey\": \"abstraction_and_interfaces\",\n      \"score\": 4,\n      \"evidence\": \"No PaymentGateway interface: one processor is in scope and a second is not on the roadmap. The seam is Ticket.close(), and I would extract the interface when a second processor arrives, not before. | PricingPolicy is an interface because the requirements already name hourly and weekend rates.\",\n      \"concern\": \"The nearest risk is that PricingPolicy is justified by two implementations that differ only in rate. If both are a multiplication by a number, the interface is carrying a parameter rather than a strategy and would collapse the first time a genuinely different pricing shape, such as a daily cap, is asked for.\",\n      \"suggestion\": \"In the trade-offs section, name one pricing rule that HourlyPricingPolicy and WeekendPricingPolicy could not express by swapping a rate, and confirm the interface still holds for it.\",\n      \"confidence\": \"high\"\n    },\n    {\n      \"criterionKey\": \"extensibility\",\n      \"score\": 4,\n      \"evidence\": \"Floor.firstFreeSlot would have to change because it must match on a capability and not only a size. Ticket, ParkingLot and the two existing pricing policies stay untouched. | The requirement my design handles badly is per-floor pricing.\",\n      \"concern\": \"The blast radius named for charging slots is smaller than the relationships imply. ParkingLot.findAvailableSlot(size) takes a size, so if allocation must match on a capability the lot's own signature changes too, which contradicts the claim that ParkingLot stays untouched.\",\n      \"suggestion\": \"Re-trace the charging-slot walkthrough through ParkingLot.findAvailableSlot as well as Floor.firstFreeSlot, and either widen what allocation matches on or say why the lot can stay size-only.\",\n      \"confidence\": \"high\"\n    }\n  ]\n}",
+  "parsed": {
+    "results": [
+      {
+        "criterionKey": "requirements_and_assumptions",
+        "score": 3,
+        "evidence": "Payment is out of scope. We model the amount owed and mark a ticket as settled, but no gateway, no refunds and no currency handling. | Deliberately not modelled: reservations, season passes, and more than one lot.",
+        "concern": "The clarifying question about started versus completed hours is raised but never answered, and PricingPolicy is specified without it, so priceFor(ticket) is defined against an ambiguity the learner themselves identified as design-changing.",
+        "suggestion": "In the assumptions section, pick one answer to the started-versus-completed-hour question and state it as an assumption, then check that Ticket carries whatever PricingPolicy needs under that answer.",
+        "confidence": "high"
+      },
+      {
+        "criterionKey": "responsibilities_and_decomposition",
+        "score": 3,
+        "evidence": "Floor - holds its own slots and knows which of them are free | Slot - represents one physical space and whether it is occupied | PricingPolicy - interface: turns a closed ticket into an amount owed",
+        "concern": "Ticket carries two jobs joined by 'and': it records entry time and the slot held, and it is the unit pricing is calculated against. Ticket.close(exitTime) belongs to the first job while slotId() exists only to serve the second, so a change to how pricing reads a ticket reaches the class that records parking events.",
+        "suggestion": "Split the pricing-facing view off Ticket: give PricingPolicy a small value object such as a ChargeableStay carrying entry time, exit time and slot descriptor, so Ticket stops being a record and a pricing input at once.",
+        "confidence": "high"
+      },
+      {
+        "criterionKey": "coupling_and_cohesion",
+        "score": 3,
+        "evidence": "ParkingLot owns its Floors; a Floor does not know the lot it sits in | Ticket records the Slot it was issued against by id, not by reference | pricing depends on the ticket, not the reverse, so pricing changes never reach the parking flow",
+        "concern": "ParkingLot.findAvailableSlot(size) and Floor.firstFreeSlot(size) are the same query at two levels, so ParkingLot must know that a Floor is the thing that holds slots. That is one level of reach-through, and it is the method that would change first if slots stopped being owned by floors.",
+        "suggestion": "Decide whether ParkingLot returns a Slot or delegates the whole allocation to Floor and returns only a Ticket. If it returns a Slot, say in the Relationships section why the lot is allowed to know about slots at all.",
+        "confidence": "medium"
+      },
+      {
+        "criterionKey": "abstraction_and_interfaces",
+        "score": 4,
+        "evidence": "No PaymentGateway interface: one processor is in scope and a second is not on the roadmap. The seam is Ticket.close(), and I would extract the interface when a second processor arrives, not before. | PricingPolicy is an interface because the requirements already name hourly and weekend rates.",
+        "concern": "The nearest risk is that PricingPolicy is justified by two implementations that differ only in rate. If both are a multiplication by a number, the interface is carrying a parameter rather than a strategy and would collapse the first time a genuinely different pricing shape, such as a daily cap, is asked for.",
+        "suggestion": "In the trade-offs section, name one pricing rule that HourlyPricingPolicy and WeekendPricingPolicy could not express by swapping a rate, and confirm the interface still holds for it.",
+        "confidence": "high"
+      },
+      {
+        "criterionKey": "extensibility",
+        "score": 4,
+        "evidence": "Floor.firstFreeSlot would have to change because it must match on a capability and not only a size. Ticket, ParkingLot and the two existing pricing policies stay untouched. | The requirement my design handles badly is per-floor pricing.",
+        "concern": "The blast radius named for charging slots is smaller than the relationships imply. ParkingLot.findAvailableSlot(size) takes a size, so if allocation must match on a capability the lot's own signature changes too, which contradicts the claim that ParkingLot stays untouched.",
+        "suggestion": "Re-trace the charging-slot walkthrough through ParkingLot.findAvailableSlot as well as Floor.firstFreeSlot, and either widen what allocation matches on or say why the lot can stay size-only.",
+        "confidence": "high"
+      }
+    ]
+  }
+}
