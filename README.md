@@ -93,6 +93,42 @@ Architecture, the two change tests, and the evaluation approach are in `docs/des
 
 ---
 
+## Deploying
+
+The app runs on Vercel with MongoDB Atlas. Set `GEMINI_API_KEY`, `MONGODB_URI`,
+`MONGODB_DB` and `CRON_SECRET`, then run the seed once against Atlas so the four
+problems and the rubric exist.
+
+### How evaluation survives serverless
+
+A serverless function can be frozen once it has sent its response, so an un-awaited
+promise started after `res.send()` may never run, and it fails silently. Awaiting the
+model inside submit is worse, because it puts a network call of up to a minute on the
+learner's write path. The handoff is therefore explicit in three steps:
+
+1. Submit persists the submission and returns `202` with an `evaluateUrl`. It never
+   touches Gemini.
+2. The browser posts to that URL. The browser is the one process nobody can freeze,
+   which makes it the real trigger rather than a convenience. It also re-triggers if
+   the page is reopened on a `SUBMITTED` attempt, and polls independently so it learns
+   the outcome even if the evaluate response never arrives.
+3. `GET /api/cron/recover` sweeps anything still stranded, using `findStale` and the
+   `FAILED -> EVALUATING` transition the domain already models. No new transition was
+   invented for recovery.
+
+`vercel.json` schedules that sweep once a day at 03:00. **Vercel's Hobby plan only
+permits daily cron jobs**, so a tighter cadence needs a Pro plan. This is acceptable
+because the sweep is the third line of defence, not the first: the client trigger
+handles the normal case, reopening the page re-triggers, and a `FAILED` attempt always
+carries a "Re-run evaluation" button the learner can press immediately. On Pro, change
+the schedule to `*/10 * * * *` and stranded attempts recover within ten minutes instead
+of by the next morning.
+
+`CRON_SECRET` guards that endpoint; Vercel Cron sends it as a Bearer token. Leaving it
+unset leaves the route open, which is the right default locally. The sweep is
+idempotent and only ever re-runs work a learner already asked for, so an open endpoint
+costs Gemini calls, not data.
+
 ## Limitations
 
 Stated up front, because a README that only lists features is not useful to anyone reviewing this.
