@@ -2,6 +2,8 @@
 
 Practise low level design and get rubric-anchored, evidence-backed feedback that persists across attempts.
 
+**Live demo:** https://lld-practice-platform-black.vercel.app
+
 A learner picks a problem (Parking Lot, Elevator, Vending Machine, Rate Limiter), writes their design as structured text, and gets feedback one criterion at a time. Every score has to point at a quote from the learner's own words, and if the evaluator cannot find one it returns "not evidenced" instead of guessing. Attempt history then shows per criterion movement, so a recurring weakness becomes visible instead of being re-learned from scratch every time.
 
 **Why it exists:** every option a learner has today gives them either a reference solution, which implies there is one right answer, or unstructured AI opinion, which is inconsistent and forgets you when the tab closes. Two valid LLD designs can look completely different, so this judges against named dimensions rather than an answer key. Full reasoning in `docs/research-note.md` and `docs/design-note.md`.
